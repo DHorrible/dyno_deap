@@ -83,24 +83,24 @@ def varAnd(population, toolbox, cxpb, mutpb):
 
 class Popolation:
     @property
-    def Size(self) -> float: return self._size
+    def Size(self): return self._size
     @property
-    def HallOfFame(self) -> tools.HallOfFame: return self._hall_of_fame
+    def HallOfFame(self): return self._hall_of_fame
     @property
-    def HallOfFameSize(self) -> int: return self._hall_of_fame_size
+    def HallOfFameSize(self): return self._hall_of_fame_size
     @property
-    def Cxpb(self) -> float: return self._cxpb
+    def Cxpb(self): return self._cxpb
     @property
-    def Mutpb(self) -> float: return self._mutpb
+    def Mutpb(self): return self._mutpb
     @property
-    def Toolbox(self) -> float: return self._toolbox
+    def Toolbox(self): return self._toolbox
 
     def __init__(self,
         size,
         cxpb,
         mutpb,
-        hall_of_fame_size: int,
-        toolbox: base.Toolbox,
+        hall_of_fame_size,
+        toolbox,
         ind_creator,
         ):
         self.Inds = [ind_creator() for _ in range(size)]
@@ -115,13 +115,13 @@ class Popolation:
         self._toolbox = toolbox
 
 def eaSimpleMultiPop(
-    populations: List[Popolation],
-    ngen: int,
-    verbose: bool=__debug__,
-    stats: tools.Statistics=None,
+    populations,
+    ngen,
+    verbose=__debug__,
+    stats=None,
     stop_cond=None,
     callback=None,
-    ) -> List[Popolation]:
+    ):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_ for several popultaions.
 
