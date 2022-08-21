@@ -187,6 +187,12 @@ def eaSimpleMultiPop(
             if population.HallOfFame is not None:
                 population.HallOfFame.update(population.Inds)
 
+            invalid_ind = [ind for ind in population.Inds if not ind.fitness.valid]
+            fitnesses = population.Toolbox.map(population.Toolbox.evaluate, invalid_ind)
+            for ind, fit in zip(invalid_ind, fitnesses):
+                ind.fitness.values = fit
+
+
         # Select the next generation individuals
         offspring = population.Toolbox.select(population.Inds, len(population.Inds) - population.HallOfFameSize)
 
