@@ -189,7 +189,7 @@ def eaSimpleMultiPop(
             ind.fitness.values = fit
 
         if population.HallOfFame is not None:
-            population.Hall)fFame.update(population.Inds)
+            population.HallfFame.update(population.Inds)
 
         hof_size = len(halloffame.items) if halloffame is not None else 0
 
