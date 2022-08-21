@@ -188,8 +188,8 @@ def eaSimpleMultiPop(
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
-        if population.Halloffame is not None:
-            population.Halloffame.update(population.Inds)
+        if population.HallOfFame is not None:
+            population.Hall)fFame.update(population.Inds)
 
         hof_size = len(halloffame.items) if halloffame is not None else 0
 
@@ -213,9 +213,9 @@ def eaSimpleMultiPop(
                 ind.fitness.values = fit
 
             # Update the hall of fame with the generated individuals
-            if population.Halloffame is not None:
-                offspring.extend(population.Halloffame.items)
-                population.Halloffame.update(offspring)
+            if population.HallOfFame is not None:
+                offspring.extend(population.HallOfFame.items)
+                population.HallOfFame.update(offspring)
 
             # Replace the current population by the offspring
             population.Inds[:] = offspring
@@ -227,8 +227,8 @@ def eaSimpleMultiPop(
                 print logbook.stream
 
             kvargs = {}
-            if population.Halloffame is not None:
-                kvargs['halloffame'] = population.Halloffame
+            if population.HallOfFame is not None:
+                kvargs['halloffame'] = population.HallOfFame
 
             if callback is not None:
                 callback(population.Inds, gen, **kvargs)
