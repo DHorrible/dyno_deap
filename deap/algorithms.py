@@ -189,7 +189,7 @@ def eaSimpleMultiPop(
             ind.fitness.values = fit
 
         if population.HallOfFame is not None:
-            population.HallOffFame.update(population.Inds)
+            population.HallOfFame.update(population.Inds)
 
         record = stats.compile(population.Inds) if stats else {}
         logbook.record(gen=0, nevals=len(invalid_ind), pop_idx=pop_idx, **record)
