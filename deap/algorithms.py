@@ -223,16 +223,16 @@ def eaSimpleMultiPop(
             kvargs = {}
             if population.HallOfFame is not None:
                 kvargs['halloffame'] = population.HallOfFame
-
-            if callback is not None:
-                callback(population.Inds, gen, **kvargs)
-
-            if stop_cond is not None:
-                if stop_cond(population.Inds, gen, **kvargs):
-                    break
         
         if cltex_f is not None and random.random() < pbcltex:
             cltex_f(populations)
+
+        if callback is not None:
+            callback(populations, gen, **kvargs)
+
+        if stop_cond is not None:
+            if stop_cond(populations, gen, **kvargs):
+                break
             
 
     return populations, logbook
