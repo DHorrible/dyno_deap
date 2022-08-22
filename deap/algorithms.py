@@ -194,8 +194,10 @@ def eaSimpleMultiPop(
             for ind, fit in zip(invalid_ind, fitnesses):
                 ind.fitness.values = fit
 
+            hof_size = len(population.HallOfFame) if population.HallOfFameSize > 0 else 0
+
             # Select the next generation individuals
-            offspring = population.Toolbox.select(population.Inds, len(population.Inds) - population.HallOfFameSize)
+            offspring = population.Toolbox.select(population.Inds, len(population.Inds) - hof_size)
 
             # Vary the pool of individuals
             offspring = varAnd(offspring, population.Toolbox, population.Cxpb, population.Mutpb)
