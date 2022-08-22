@@ -118,7 +118,7 @@ def eaSimpleMultiPop(
     populations,
     ngen,
     pbcltex,
-    ctlex_f,
+    cltex_f,
     verbose=__debug__,
     stats=None,
     stop_cond=None,
@@ -231,8 +231,8 @@ def eaSimpleMultiPop(
                 if stop_cond(population.Inds, gen, **kvargs):
                     break
         
-        if ctlex_f is not None and random.random() < pbctlex:
-            ctlex_f(populations)
+        if cltex_f is not None and random.random() < pbcltex:
+            cltex_f(populations)
             
 
     return populations, logbook
