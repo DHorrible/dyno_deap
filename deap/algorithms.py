@@ -117,6 +117,8 @@ class Popolation:
 def eaSimpleMultiPop(
     populations,
     ngen,
+    pbcltex,
+    ctlex_f,
     verbose=__debug__,
     stats=None,
     stop_cond=None,
@@ -192,43 +194,46 @@ def eaSimpleMultiPop(
             for ind, fit in zip(invalid_ind, fitnesses):
                 ind.fitness.values = fit
 
+            # Select the next generation individuals
+            offspring = population.Toolbox.select(population.Inds, len(population.Inds) - population.HallOfFameSize)
 
-        # Select the next generation individuals
-        offspring = population.Toolbox.select(population.Inds, len(population.Inds) - population.HallOfFameSize)
+            # Vary the pool of individuals
+            offspring = varAnd(offspring, population.Toolbox, population.Cxpb, population.Mutpb)
 
-        # Vary the pool of individuals
-        offspring = varAnd(offspring, population.Toolbox, population.Cxpb, population.Mutpb)
+            # Evaluate the individuals with an invalid fitness
+            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+            fitnesses = population.Toolbox.map(population.Toolbox.evaluate, invalid_ind)
+            for ind, fit in zip(invalid_ind, fitnesses):
+                ind.fitness.values = fit
 
-        # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = population.Toolbox.map(population.Toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+            # Update the hall of fame with the generated individuals
+            if population.HallOfFame is not None:
+                offspring.extend(population.HallOfFame.items)
+                population.HallOfFame.update(offspring)
 
-        # Update the hall of fame with the generated individuals
-        if population.HallOfFame is not None:
-            offspring.extend(population.HallOfFame.items)
-            population.HallOfFame.update(offspring)
+            # Replace the current population by the offspring
+            population.Inds[:] = offspring
 
-        # Replace the current population by the offspring
-        population.Inds[:] = offspring
+            # Append the current generation statistics to the logbook
+            record = stats.compile(population.Inds) if stats else {}
+            logbook.record(gen=gen, nevals=len(invalid_ind), pop_idx=pop_idx, **record)
+            if verbose:
+                print logbook.stream
 
-        # Append the current generation statistics to the logbook
-        record = stats.compile(population.Inds) if stats else {}
-        logbook.record(gen=gen, nevals=len(invalid_ind), pop_idx=pop_idx, **record)
-        if verbose:
-            print logbook.stream
+            kvargs = {}
+            if population.HallOfFame is not None:
+                kvargs['halloffame'] = population.HallOfFame
 
-        kvargs = {}
-        if population.HallOfFame is not None:
-            kvargs['halloffame'] = population.HallOfFame
+            if callback is not None:
+                callback(population.Inds, gen, **kvargs)
 
-        if callback is not None:
-            callback(population.Inds, gen, **kvargs)
-
-        if stop_cond is not None:
-            if stop_cond(population.Inds, gen, **kvargs):
-                break
+            if stop_cond is not None:
+                if stop_cond(population.Inds, gen, **kvargs):
+                    break
+        
+        if ctlex_f is not None and random.random() < pbctlex:
+            ctlex_f(populations)
+            
 
     return populations, logbook
 
