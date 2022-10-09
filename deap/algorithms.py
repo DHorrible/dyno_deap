@@ -349,7 +349,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
-            print logbook.stream
+            logging.info(logbook.stream)
 
         kvargs = {}
         if halloffame is not None:
