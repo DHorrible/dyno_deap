@@ -321,10 +321,10 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     record = stats.compile(population) if stats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
-        print logbook.stream
+        logging.info(logbook.stream)
 
     # Begin the generational process
-    for gen in range(1, ngen + 1):
+    for gen in range(1, ngen):
         # Select the next generation individuals
         offspring = toolbox.select(population, len(population) - hof_size)
 
