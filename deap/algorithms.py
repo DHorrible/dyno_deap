@@ -26,6 +26,7 @@ you really want them to do.
 """
 
 import random
+import logging
 
 import tools, base
 
@@ -220,7 +221,7 @@ def eaSimpleMultiPop(
             record = stats.compile(population.Inds) if stats else {}
             logbook.record(gen=gen, nevals=len(invalid_ind), pop_idx=pop_idx, **record)
             if verbose:
-                print logbook.stream
+                logging.info(logbook.stream)
 
             kvargs = {}
             if population.HallOfFame is not None:
