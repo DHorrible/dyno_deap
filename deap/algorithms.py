@@ -97,13 +97,31 @@ class Popolation:
     def Toolbox(self): return self._toolbox
 
     def __init__(self,
+        inds,
+        cxpb,
+        mutpb,
+        hall_of_fame_size,
+        toolbox,
+    ):
+        self.Inds = inds
+
+        self._size = len(inds)
+        self._hall_of_fame_size = hall_of_fame_size
+        self._hall_of_fame = None
+        if self._hall_of_fame_size > 0:
+            self._hall_of_fame = tools.HallOfFame(self._hall_of_fame_size)
+        self._cxpb = cxpb
+        self._mutpb = mutpb
+        self._toolbox = toolbox
+
+    def __init__(self,
         size,
         cxpb,
         mutpb,
         hall_of_fame_size,
         toolbox,
         ind_creator,
-        ):
+    ):
         self.Inds = [ind_creator() for _ in range(size)]
 
         self._size = size
@@ -124,7 +142,8 @@ def eaSimpleMultiPop(
     stats=None,
     stop_cond=None,
     callback=None,
-    ):
+    logger=logging.root,
+):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_ for several popultaions.
 
@@ -221,7 +240,7 @@ def eaSimpleMultiPop(
             record = stats.compile(population.Inds) if stats else {}
             logbook.record(gen=gen, nevals=len(invalid_ind), pop_idx=pop_idx, **record)
             if verbose:
-                logging.info(logbook.stream)
+                logger.info(logbook.stream)
 
             kvargs = {}
             if population.HallOfFame is not None:
@@ -243,7 +262,7 @@ def eaSimpleMultiPop(
 
 def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
              halloffame=None, verbose=__debug__,
-             stop_cond=None, callback=None):
+             stop_cond=None, callback=None, logger=logging.root):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
 
@@ -321,7 +340,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     record = stats.compile(population) if stats else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
-        logging.info(logbook.stream)
+        logger.info(logbook.stream)
 
     # Begin the generational process
     for gen in range(1, ngen):
@@ -349,7 +368,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         record = stats.compile(population) if stats else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
-            logging.info(logbook.stream)
+            logger.info(logbook.stream)
 
         kvargs = {}
         if halloffame is not None:
@@ -422,7 +441,7 @@ def varOr(population, toolbox, lambda_, cxpb, mutpb):
 
 
 def eaMuPlusLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
-                   stats=None, halloffame=None, verbose=__debug__):
+                   stats=None, halloffame=None, verbose=__debug__, logger=logging.root):
     r"""This is the :math:`(\mu + \lambda)` evolutionary algorithm.
 
     :param population: A list of individuals.
@@ -484,7 +503,7 @@ def eaMuPlusLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
     record = stats.compile(population) if stats is not None else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
-        logging.info(logbook.stream)
+        logger.info(logbook.stream)
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
@@ -508,13 +527,13 @@ def eaMuPlusLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
         record = stats.compile(population) if stats is not None else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
-            logging.info(logbook.stream)
+            logger.info(logbook.stream)
 
     return population, logbook
 
 
 def eaMuCommaLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
-                    stats=None, halloffame=None, verbose=__debug__):
+                    stats=None, halloffame=None, verbose=__debug__, logger=logging.root):
     r"""This is the :math:`(\mu~,~\lambda)` evolutionary algorithm.
 
     :param population: A list of individuals.
@@ -585,7 +604,7 @@ def eaMuCommaLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
     record = stats.compile(population) if stats is not None else {}
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
     if verbose:
-        logging.info(logbook.stream)
+        logger.info(logbook.stream)
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
@@ -609,12 +628,12 @@ def eaMuCommaLambda(population, toolbox, mu, lambda_, cxpb, mutpb, ngen,
         record = stats.compile(population) if stats is not None else {}
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
         if verbose:
-            logging.info(logbook.stream)
+            logger.info(logbook.stream)
     return population, logbook
 
 
 def eaGenerateUpdate(toolbox, ngen, halloffame=None, stats=None,
-                     verbose=__debug__):
+                     verbose=__debug__, logger=logging.root):
     """This is algorithm implements the ask-tell model proposed in
     [Colette2010]_, where ask is called `generate` and tell is called `update`.
 
@@ -674,6 +693,6 @@ def eaGenerateUpdate(toolbox, ngen, halloffame=None, stats=None,
         record = stats.compile(population) if stats is not None else {}
         logbook.record(gen=gen, nevals=len(population), **record)
         if verbose:
-            logging.info(logbook.stream)
+            logger.info(logbook.stream)
 
     return population, logbook
