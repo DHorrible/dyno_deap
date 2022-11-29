@@ -116,25 +116,6 @@ class Popolation:
         self._mutpb = mutpb
         self._toolbox = toolbox
 
-    def __init__(self,
-        size,
-        cxpb,
-        mutpb,
-        hall_of_fame_size,
-        toolbox,
-        ind_creator,
-    ):
-        self._inds = [ind_creator() for _ in range(size)]
-
-        self._size = size
-        self._hall_of_fame_size = hall_of_fame_size
-        self._hall_of_fame = None
-        if self._hall_of_fame_size > 0:
-            self._hall_of_fame = tools.HallOfFame(self._hall_of_fame_size)
-        self._cxpb = cxpb
-        self._mutpb = mutpb
-        self._toolbox = toolbox
-
 def eaSimpleMultiPop(
     populations,
     ngen,
