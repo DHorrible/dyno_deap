@@ -84,6 +84,8 @@ def varAnd(population, toolbox, cxpb, mutpb):
 
 class Popolation:
     @property
+    def Inds(self): return self._inds
+    @property
     def Size(self): return self._size
     @property
     def HallOfFame(self): return self._hall_of_fame
@@ -103,7 +105,7 @@ class Popolation:
         hall_of_fame_size,
         toolbox,
     ):
-        self.Inds = inds
+        self._inds = inds
 
         self._size = len(inds)
         self._hall_of_fame_size = hall_of_fame_size
@@ -122,7 +124,7 @@ class Popolation:
         toolbox,
         ind_creator,
     ):
-        self.Inds = [ind_creator() for _ in range(size)]
+        self._inds = [ind_creator() for _ in range(size)]
 
         self._size = size
         self._hall_of_fame_size = hall_of_fame_size
