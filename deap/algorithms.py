@@ -220,7 +220,7 @@ def eaSimpleMultiPop(
             population.HallOfFame.update(population.Inds)
 
         logOffspring(population.Inds, stats, logbook, logger, verbose,
-                        gen=0, nevals=len(invalid_ind_num), pop_idx=pop_idx)
+                        gen=0, nevals=invalid_ind_num, pop_idx=pop_idx)
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
