@@ -244,7 +244,7 @@ def eaSimpleMultiPop(
 
             # Append the current generation statistics to the logbook
             logOffspring(population.Inds, stats, logbook, logger, verbose,
-                         gen=gen, nevals=len(invalid_ind_num), pop_idx=pop_idx)
+                         gen=gen, nevals=invalid_ind_num, pop_idx=pop_idx)
 
             # kvargs = {}
             # if population.HallOfFame is not None:
