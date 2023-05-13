@@ -186,23 +186,13 @@ def eaSimpleMultiPop(
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals', 'pop_idx'] + (stats.fields if stats else [])
 
+    hof_sizes = [pop.HallOfFameSize if pop.HallOfFame is not None else 0 for pop in populations]
+
     # Begin the generational process
     for gen in range(ngen):
         for pop_idx, population in enumerate(populations):
-            # if population.HallOfFame is not None:
-            #     population.HallOfFame.update(population.Inds)
-
-            # invalid_ind = [ind for ind in population.Inds if not ind.fitness.valid]
-            # fitnesses = population.Toolbox.map(population.Toolbox.evaluate, invalid_ind)
-            # for ind, fit in zip(invalid_ind, fitnesses):
-            #     ind.fitness.values = fit
-
-            # hof_size = len(population.HallOfFame) if population.HallOfFameSize > 0 else 0
-
             # Select the next generation individuals
-            # offspring = population.Toolbox.select(population.Inds, len(population.Inds) - hof_size)
-
-            offspring = population.Toolbox.select(population.Inds, len(population.Inds))
+            offspring = population.Toolbox.select(population.Inds, len(population.Inds) - hof_sizes[pop_idx])
 
             # Vary the pool of individuals
             offspring = varAnd(offspring, population.Toolbox, population.Cxpb, population.Mutpb)
@@ -227,12 +217,15 @@ def eaSimpleMultiPop(
             if verbose:
                 logger.info(logbook.stream)
 
-            kvargs = {}
-            if population.HallOfFame is not None:
-                kvargs['halloffame'] = population.HallOfFame
+            # kvargs = {}
+            # if population.HallOfFame is not None:
+            #     kvargs['halloffame'] = population.HallOfFame
         
         if cltex_f is not None and random.random() < pbcltex:
             cltex_f(populations)
+
+        # TODO
+        kvargs = {}
 
         if callback is not None:
             callback(populations, gen, **kvargs)
@@ -240,7 +233,6 @@ def eaSimpleMultiPop(
         if stop_cond is not None:
             if stop_cond(populations, gen, **kvargs):
                 break
-            
 
     return populations, logbook
 
