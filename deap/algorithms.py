@@ -189,18 +189,20 @@ def eaSimpleMultiPop(
     # Begin the generational process
     for gen in range(ngen):
         for pop_idx, population in enumerate(populations):
-            if population.HallOfFame is not None:
-                population.HallOfFame.update(population.Inds)
+            # if population.HallOfFame is not None:
+            #     population.HallOfFame.update(population.Inds)
 
-            invalid_ind = [ind for ind in population.Inds if not ind.fitness.valid]
-            fitnesses = population.Toolbox.map(population.Toolbox.evaluate, invalid_ind)
-            for ind, fit in zip(invalid_ind, fitnesses):
-                ind.fitness.values = fit
+            # invalid_ind = [ind for ind in population.Inds if not ind.fitness.valid]
+            # fitnesses = population.Toolbox.map(population.Toolbox.evaluate, invalid_ind)
+            # for ind, fit in zip(invalid_ind, fitnesses):
+            #     ind.fitness.values = fit
 
-            hof_size = len(population.HallOfFame) if population.HallOfFameSize > 0 else 0
+            # hof_size = len(population.HallOfFame) if population.HallOfFameSize > 0 else 0
 
             # Select the next generation individuals
-            offspring = population.Toolbox.select(population.Inds, len(population.Inds) - hof_size)
+            # offspring = population.Toolbox.select(population.Inds, len(population.Inds) - hof_size)
+
+            offspring = population.Toolbox.select(population.Inds, len(population.Inds))
 
             # Vary the pool of individuals
             offspring = varAnd(offspring, population.Toolbox, population.Cxpb, population.Mutpb)
