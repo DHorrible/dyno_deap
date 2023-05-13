@@ -196,11 +196,12 @@ def eaSimpleMultiPop(
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals', 'pop_idx'] + (stats.fields if stats else [])
 
-    hof_sizes = [pop.HallOfFameSize if pop.HallOfFame is not None else 0 for pop in populations]
-    for pop in populations:
-        calcFitness(pop.Inds, population.Toolbox)
-        if pop.HallOfFame is not None:
-            pop.HallOfFame.update(pop.Inds)
+    hof_sizes = [0] * None
+    for i, population in enumerate(populations):
+        calcFitness(population.Inds, population.Toolbox)
+        if population.HallOfFame is not None:
+            hof_sizes[i] = population.HallOfFameSize
+            population.HallOfFame.update(population.Inds)
 
     # Begin the generational process
     for gen in range(ngen):
