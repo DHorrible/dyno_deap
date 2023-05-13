@@ -196,7 +196,7 @@ def eaSimpleMultiPop(
     logbook = tools.Logbook()
     logbook.header = ['gen', 'nevals', 'pop_idx'] + (stats.fields if stats else [])
 
-    hof_sizes = [0] * None
+    hof_sizes = [0] * len(populations)
     for i, population in enumerate(populations):
         calcFitness(population.Inds, population.Toolbox)
         if population.HallOfFame is not None:
