@@ -116,6 +116,16 @@ class Popolation:
         self._mutpb = mutpb
         self._toolbox = toolbox
 
+def calcFitness(
+    offspring,
+    toolbox
+):
+    invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+    fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+    for ind, fit in zip(invalid_ind, fitnesses):
+        ind.fitness.values = fit
+    return len(invalid_ind)
+
 def eaSimpleMultiPop(
     populations,
     ngen,
@@ -188,6 +198,7 @@ def eaSimpleMultiPop(
 
     hof_sizes = [pop.HallOfFameSize if pop.HallOfFame is not None else 0 for pop in populations]
     for pop in populations:
+        calcFitness(pop.Inds, population.Toolbox)
         if pop.HallOfFame is not None:
             pop.HallOfFame.update(pop.Inds)
 
@@ -201,10 +212,7 @@ def eaSimpleMultiPop(
             offspring = varAnd(offspring, population.Toolbox, population.Cxpb, population.Mutpb)
 
             # Evaluate the individuals with an invalid fitness
-            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-            fitnesses = population.Toolbox.map(population.Toolbox.evaluate, invalid_ind)
-            for ind, fit in zip(invalid_ind, fitnesses):
-                ind.fitness.values = fit
+            invalid_ind_num = calcFitness(offspring, population.Toolbox)
 
             # Update the hall of fame with the generated individuals
             if population.HallOfFame is not None:
@@ -216,7 +224,7 @@ def eaSimpleMultiPop(
 
             # Append the current generation statistics to the logbook
             record = stats.compile(population.Inds) if stats else {}
-            logbook.record(gen=gen, nevals=len(invalid_ind), pop_idx=pop_idx, **record)
+            logbook.record(gen=gen, nevals=len(invalid_ind_num), pop_idx=pop_idx, **record)
             if verbose:
                 logger.info(logbook.stream)
 
