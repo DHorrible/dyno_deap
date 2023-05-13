@@ -126,6 +126,21 @@ def calcFitness(
         ind.fitness.values = fit
     return len(invalid_ind)
 
+def logOffspring(
+    offspring,
+    stats,
+    logbook,
+    logger,
+    verbose=__debug__,
+    **kvargs
+):
+    record = stats.compile(offspring) if stats else {}
+    record.update(kvargs)
+    logbook.record(**record)
+    if verbose:
+        logger.info(logbook.stream)
+
+
 def eaSimpleMultiPop(
     populations,
     ngen,
@@ -197,14 +212,18 @@ def eaSimpleMultiPop(
     logbook.header = ['gen', 'nevals', 'pop_idx'] + (stats.fields if stats else [])
 
     hof_sizes = [0] * len(populations)
-    for i, population in enumerate(populations):
-        calcFitness(population.Inds, population.Toolbox)
+    for pop_idx, population in enumerate(populations):
+        invalid_ind_num = calcFitness(population.Inds, population.Toolbox)
+        
         if population.HallOfFame is not None:
-            hof_sizes[i] = population.HallOfFameSize
+            hof_sizes[pop_idx] = population.HallOfFameSize
             population.HallOfFame.update(population.Inds)
 
+        logOffspring(population.Inds, stats, logbook, logger, verbose,
+                        gen=0, nevals=len(invalid_ind_num), pop_idx=pop_idx)
+
     # Begin the generational process
-    for gen in range(ngen):
+    for gen in range(1, ngen + 1):
         for pop_idx, population in enumerate(populations):
             # Select the next generation individuals
             offspring = population.Toolbox.select(population.Inds, len(population.Inds) - hof_sizes[pop_idx])
@@ -224,10 +243,8 @@ def eaSimpleMultiPop(
             population.Inds[:] = offspring
 
             # Append the current generation statistics to the logbook
-            record = stats.compile(population.Inds) if stats else {}
-            logbook.record(gen=gen, nevals=len(invalid_ind_num), pop_idx=pop_idx, **record)
-            if verbose:
-                logger.info(logbook.stream)
+            logOffspring(population.Inds, stats, logbook, logger, verbose,
+                         gen=gen, nevals=len(invalid_ind_num), pop_idx=pop_idx)
 
             # kvargs = {}
             # if population.HallOfFame is not None:
@@ -316,23 +333,18 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
 
     # Evaluate the individuals with an invalid fitness
-    invalid_ind = [ind for ind in population if not ind.fitness.valid]
-    fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-    for ind, fit in zip(invalid_ind, fitnesses):
-        ind.fitness.values = fit
+    invalid_ind_num = calcFitness(population, toolbox)
 
     if halloffame is not None:
         halloffame.update(population)
 
     hof_size = len(halloffame.items) if halloffame is not None else 0
 
-    record = stats.compile(population) if stats else {}
-    logbook.record(gen=0, nevals=len(invalid_ind), **record)
-    if verbose:
-        logger.info(logbook.stream)
+    logOffspring(population, stats, logbook, logger, verbose,
+                 gen=0, nevals=invalid_ind_num)
 
     # Begin the generational process
-    for gen in range(1, ngen):
+    for gen in range(1, ngen + 1):
         # Select the next generation individuals
         offspring = toolbox.select(population, len(population) - hof_size)
 
@@ -340,10 +352,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         offspring = varAnd(offspring, toolbox, cxpb, mutpb)
 
         # Evaluate the individuals with an invalid fitness
-        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-        for ind, fit in zip(invalid_ind, fitnesses):
-            ind.fitness.values = fit
+        invalid_ind_num = calcFitness(offspring, toolbox)
 
         # Update the hall of fame with the generated individuals
         if halloffame is not None:
@@ -354,10 +363,8 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         population[:] = offspring
 
         # Append the current generation statistics to the logbook
-        record = stats.compile(population) if stats else {}
-        logbook.record(gen=gen, nevals=len(invalid_ind), **record)
-        if verbose:
-            logger.info(logbook.stream)
+        logOffspring(population, stats, logbook, logger, verbose,
+                     gen=gen, nevals=invalid_ind_num)
 
         kvargs = {}
         if halloffame is not None:
