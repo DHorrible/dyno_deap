@@ -151,7 +151,7 @@ def eaSimpleMultiPop(
     stop_cond=None,
     callback=None,
     logger=logging.root,
-    ind_creator_f=None,
+    ind_creators_f=None,
 ):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_ for several popultaions.
@@ -221,7 +221,7 @@ def eaSimpleMultiPop(
             hof_sizes[pop_idx] = population.HallOfFameSize
             population.HallOfFame.update(population.Inds)
 
-        if hasattr(population.Toolbox, 'mandatory_new_num') and ind_creator_f is not None:
+        if hasattr(population.Toolbox, 'mandatory_new_num') and ind_creators_f is not None:
             mandatory_new_nums[pop_idx] = population.Toolbox.mandatory_new_num()
 
         logOffspring(population.Inds, stats, logbook, logger, verbose,
@@ -240,7 +240,7 @@ def eaSimpleMultiPop(
             offspring = varAnd(offspring, population.Toolbox, population.Cxpb, population.Mutpb)
 
             for _ in range(mandatory_new_nums[pop_idx]):
-                offspring.append(ind_creator_f())
+                offspring.append(ind_creators_f[pop_idx]())
 
             # Evaluate the individuals with an invalid fitness
             invalid_ind_num = calcFitness(offspring, population.Toolbox)
