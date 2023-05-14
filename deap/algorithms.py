@@ -222,7 +222,7 @@ def eaSimpleMultiPop(
             population.HallOfFame.update(population.Inds)
 
         if hasattr(population.Toolbox, 'mandatory_new_num') and ind_creator_f is not None:
-            mandatory_new_nums[pop_idx] = population.Toolbox.mandatory_new_num
+            mandatory_new_nums[pop_idx] = population.Toolbox.mandatory_new_num()
 
         logOffspring(population.Inds, stats, logbook, logger, verbose,
                         gen=0, nevals=invalid_ind_num, pop_idx=pop_idx)
@@ -350,7 +350,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         halloffame.update(population)
 
     hof_size = len(halloffame.items) if halloffame is not None else 0
-    mandatory_new_num = toolbox.mandatory_new_num if hasattr(toolbox, 'mandatory_new_num') and ind_creator_f is not None else 0
+    mandatory_new_num = toolbox.mandatory_new_num() if hasattr(toolbox, 'mandatory_new_num') and ind_creator_f is not None else 0
 
     logOffspring(population, stats, logbook, logger, verbose,
                  gen=0, nevals=invalid_ind_num)
