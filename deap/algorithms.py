@@ -151,6 +151,7 @@ def eaSimpleMultiPop(
     stop_cond=None,
     callback=None,
     logger=logging.root,
+    ind_creator_f=None,
 ):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_ for several popultaions.
@@ -212,6 +213,7 @@ def eaSimpleMultiPop(
     logbook.header = ['gen', 'nevals', 'pop_idx'] + (stats.fields if stats else [])
 
     hof_sizes = [0] * len(populations)
+    mandatory_new_nums = [0] * len(populations)
     for pop_idx, population in enumerate(populations):
         invalid_ind_num = calcFitness(population.Inds, population.Toolbox)
         
@@ -219,17 +221,26 @@ def eaSimpleMultiPop(
             hof_sizes[pop_idx] = population.HallOfFameSize
             population.HallOfFame.update(population.Inds)
 
+        if hasattr(population.Toolbox, 'mandatory_new_num') and ind_creator_f is not None:
+            mandatory_new_nums[pop_idx] = population.Toolbox.mandatory_new_num
+
         logOffspring(population.Inds, stats, logbook, logger, verbose,
                         gen=0, nevals=invalid_ind_num, pop_idx=pop_idx)
 
     # Begin the generational process
     for gen in range(1, ngen + 1):
-        for pop_idx, population in enumerate(populations):
+        for pop_idx, population in enumerate(populations):    
             # Select the next generation individuals
-            offspring = population.Toolbox.select(population.Inds, len(population.Inds) - hof_sizes[pop_idx])
+            offspring = population.Toolbox.select(
+                population.Inds, 
+                len(population.Inds) - hof_sizes[pop_idx] - mandatory_new_nums[pop_idx],
+            )
 
             # Vary the pool of individuals
             offspring = varAnd(offspring, population.Toolbox, population.Cxpb, population.Mutpb)
+
+            for _ in range(mandatory_new_nums[pop_idx]):
+                offspring.append(ind_creator_f())
 
             # Evaluate the individuals with an invalid fitness
             invalid_ind_num = calcFitness(offspring, population.Toolbox)
@@ -268,7 +279,7 @@ def eaSimpleMultiPop(
 
 def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
              halloffame=None, verbose=__debug__,
-             stop_cond=None, callback=None, logger=logging.root):
+             stop_cond=None, callback=None, logger=logging.root, ind_creator_f=None):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
 
@@ -339,6 +350,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         halloffame.update(population)
 
     hof_size = len(halloffame.items) if halloffame is not None else 0
+    mandatory_new_num = toolbox.mandatory_new_num if hasattr(toolbox, 'mandatory_new_num') and ind_creator_f is not None else 0
 
     logOffspring(population, stats, logbook, logger, verbose,
                  gen=0, nevals=invalid_ind_num)
@@ -346,10 +358,13 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     # Begin the generational process
     for gen in range(1, ngen + 1):
         # Select the next generation individuals
-        offspring = toolbox.select(population, len(population) - hof_size)
+        offspring = toolbox.select(population, len(population) - hof_size - mandatory_new_num)
 
         # Vary the pool of individuals
         offspring = varAnd(offspring, toolbox, cxpb, mutpb)
+
+        for _ in range(mandatory_new_num):
+            offspring.append(ind_creator_f())
 
         # Evaluate the individuals with an invalid fitness
         invalid_ind_num = calcFitness(offspring, toolbox)
