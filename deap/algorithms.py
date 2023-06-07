@@ -349,7 +349,7 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     if halloffame is not None:
         halloffame.update(population)
 
-    hof_size = len(halloffame.items) if halloffame is not None else 0
+    hof_size = halloffame.maxsize if halloffame is not None else 0
     mandatory_new_num = toolbox.mandatory_new_num() if hasattr(toolbox, 'mandatory_new_num') and ind_creator_f is not None else 0
 
     logOffspring(population, stats, logbook, logger, verbose,
@@ -697,6 +697,7 @@ def eaGenerateUpdate(toolbox, ngen, halloffame=None, stats=None,
 
         if halloffame is not None:
             halloffame.update(population)
+            population.extend(halloffame.items)
 
         # Update the strategy with the evaluated individuals
         toolbox.update(population)
